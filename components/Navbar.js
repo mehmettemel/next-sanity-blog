@@ -13,7 +13,11 @@ function Navbar() {
       boxShadow='rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px'
     >
       <Box p='5'>
-        <Heading size='md'>Temel Blog</Heading>
+        <Heading size='md'>
+          <Link onClick={() => router.push('/')} colorScheme='teal' mr='20'>
+            Temel Blog
+          </Link>
+        </Heading>
       </Box>
       <Spacer />
       <Box p='5'>

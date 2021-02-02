@@ -41,44 +41,42 @@ export default function Home({ posts }) {
   return (
     <div>
       <Navbar />
-      <Container maxW='100ch' my='1em'>
-        <Heading as='h1' textAlign='center' my='2em'>
-          Welcome to my blog
-        </Heading>
 
-        <Box>
-          <Flex justify='space-between' wrap>
-            {mappedPosts.length ? (
-              mappedPosts.map((p, index) => (
-                <LinkBox
-                  key={index}
-                  mx='1em'
-                  boxShadow='rgba(99, 99, 99, 0.2) 0px 2px 8px 0px'
-                  px='1em'
-                  py='1em'
-                  h='100%'
-                  cursor='pointer'
-                  transition='.5s ease'
-                  _hover={{
-                    boxShadow: 'rgba(99, 99, 99, 0.2) 5px 7px 10px 2px',
-                  }}
-                >
-                  <LinkOverlay
-                    onClick={() => router.push(`/post/${p.slug.current}`)}
-                  >
-                    <Text fontSize='xl' fontWeight='600'>
-                      {p.title}
-                    </Text>
-                    <Image objectFit='cover' src={p.mainImage} my='.5em' />
-                  </LinkOverlay>
-                </LinkBox>
-              ))
-            ) : (
-              <div>No Post Found Yet</div>
-            )}
-          </Flex>
-        </Box>
-      </Container>
+      <Heading as='h1' textAlign='center' my='2em'>
+        Welcome to my blog
+      </Heading>
+
+      <Flex justify='space-evenly' flexWrap='wrap'>
+        {mappedPosts.length ? (
+          mappedPosts.map((p, index) => (
+            <LinkBox
+              key={index}
+              mx='1em'
+              my='2em'
+              boxShadow='rgba(99, 99, 99, 0.2) 0px 2px 8px 0px'
+              px='1em'
+              py='1em'
+              h='100%'
+              cursor='pointer'
+              transition='.5s ease'
+              _hover={{
+                boxShadow: 'rgba(99, 99, 99, 0.2) 5px 7px 10px 2px',
+              }}
+            >
+              <LinkOverlay
+                onClick={() => router.push(`/post/${p.slug.current}`)}
+              >
+                <Text fontSize='xl' fontWeight='600'>
+                  {p.title}
+                </Text>
+                <Image objectFit='cover' src={p.mainImage} my='.5em' />
+              </LinkOverlay>
+            </LinkBox>
+          ))
+        ) : (
+          <div>No Post Found Yet</div>
+        )}
+      </Flex>
     </div>
   )
 }
