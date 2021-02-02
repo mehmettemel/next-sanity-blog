@@ -1,65 +1,104 @@
 import Head from 'next/head'
+import Navbar from '../components/Navbar'
 import styles from '../styles/Home.module.css'
+import imageUrlBuilder from '@sanity/image-url'
+import BlockContent from '@sanity/block-content-to-react'
+import {
+  Box,
+  Container,
+  Flex,
+  Heading,
+  Image,
+  LinkBox,
+  LinkOverlay,
+  Text,
+} from '@chakra-ui/react'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
+export default function Home({ posts }) {
+  const [mappedPosts, setMappedPosts] = useState([])
+  const router = useRouter()
+  useEffect(() => {
+    if (posts.length) {
+      const imageBuilder = imageUrlBuilder({
+        projectId: 'tx0bnokj',
+        dataset: 'production',
+      })
 
-export default function Home() {
+      setMappedPosts(
+        posts.map((p) => {
+          return {
+            ...p,
+            mainImage: imageBuilder.image(p.mainImage).width(500).height(250),
+          }
+        })
+      )
+    } else {
+      setMappedPosts([])
+    }
+    return () => {}
+  }, [posts])
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+    <div>
+      <Navbar />
+      <Container maxW='100ch' my='1em'>
+        <Heading as='h1' textAlign='center' my='2em'>
+          Welcome to my blog
+        </Heading>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
+        <Box>
+          <Flex justify='space-between' wrap>
+            {mappedPosts.length ? (
+              mappedPosts.map((p, index) => (
+                <LinkBox
+                  key={index}
+                  mx='1em'
+                  boxShadow='rgba(99, 99, 99, 0.2) 0px 2px 8px 0px'
+                  px='1em'
+                  py='1em'
+                  h='100%'
+                  cursor='pointer'
+                  transition='.5s ease'
+                  _hover={{
+                    boxShadow: 'rgba(99, 99, 99, 0.2) 5px 7px 10px 2px',
+                  }}
+                >
+                  <LinkOverlay
+                    onClick={() => router.push(`/post/${p.slug.current}`)}
+                  >
+                    <Text fontSize='xl' fontWeight='600'>
+                      {p.title}
+                    </Text>
+                    <Image objectFit='cover' src={p.mainImage} my='.5em' />
+                  </LinkOverlay>
+                </LinkBox>
+              ))
+            ) : (
+              <div>No Post Found Yet</div>
+            )}
+          </Flex>
+        </Box>
+      </Container>
     </div>
   )
+}
+
+export const getServerSideProps = async (pageContext) => {
+  const query = encodeURIComponent('*[ _type == "post" ]')
+  const url = `https://tx0bnokj.api.sanity.io/v1/data/query/production?query=${query}`
+  const result = await fetch(url).then((res) => res.json())
+
+  if (!result.result || !result.result.length) {
+    return {
+      props: {
+        posts: [],
+      },
+    }
+  } else {
+    return {
+      props: {
+        posts: result.result,
+      },
+    }
+  }
 }
